@@ -66,7 +66,6 @@ contract Raffle is VRFConsumerBaseV2 {
     constructor(
         uint256 entranceFee, 
         uint256 interval, 
-        uint256 timeStamp, 
         address vrfCoordinator, 
         bytes32 gasLane, 
         uint64 subscriptionId,
@@ -79,7 +78,7 @@ contract Raffle is VRFConsumerBaseV2 {
         i_subscriptionId = subscriptionId;
         i_callbackGasLimit = callbackGasLimit;
 
-        s_lastTimeStamp = timeStamp;
+        s_lastTimeStamp = block.timestamp;
         s_raffleState = RaffleState.OPEN;
     }
 
@@ -148,7 +147,14 @@ contract Raffle is VRFConsumerBaseV2 {
     }
 
     /** Getting Functions */
-    function getEntranceFee() public view returns(uint256) {
+    function getEntranceFee() external view returns(uint256) {
         return i_entranceFee;
+    }
+    function getRaffleState() external view returns(RaffleState) {
+        return s_raffleState;
+    }
+
+    function getPlayer(uint256 indexOfPlayer) external view returns(address) {
+        return s_players[indexOfPlayer];
     }
 }
