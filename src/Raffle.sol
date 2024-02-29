@@ -36,6 +36,7 @@ contract Raffle is VRFConsumerBaseV2 {
     error Raffle__NotEnoughEthSent();
     error Raffle__TranferFailed();
     error Raffle__NotOpen();
+    error Raffle__NotPerformUpkeep(uint256 balance, uint256 playersNum, uint256 interval, uint256 state);
 
     enum RaffleState{
         OPEN,
@@ -93,10 +94,11 @@ contract Raffle is VRFConsumerBaseV2 {
         emit EnteredRaffle(msg.sender);
     }
 
-    function pickWinner() external {
-        if(block.timestamp - s_lastTimeStamp < i_interval) {
-            revert();
-        }
+    function performUpkeep(bytes calldata /* performData */) external {
+        (bool upkeepNeeded,) = checkUpkeep(bytes(""));
+       if(!upkeepNeeded){
+            revert Raffle__NotPerformUpkeep(address(this).balance, s_players.length, i_interval, uint256(s_raffleState));
+       }
         // 1. Request the RNG
         // https://docs.chain.link/vrf/v2/subscription/supported-networks
         s_raffleState = RaffleState.CALCULATING;
@@ -110,8 +112,26 @@ contract Raffle is VRFConsumerBaseV2 {
         // 2. Get the random number
     }
 
+    /**
+     * @dev Perform upkeep using Chainlink Automation 
+     */
+    function checkUpkeep(
+        bytes memory /* checkData */
+    )
+        public
+        view
+        returns (bool upkeepNeeded, bytes memory /* performData */)
+    {
+        bool timeSatisfied = (block.timestamp - s_lastTimeStamp) > i_interval;
+        bool raffleOpen = s_raffleState == RaffleState.OPEN;
+        bool hasPlayers = s_players.length > 0;
+        bool hasBalance = address(this).balance > 0;
+        bool doUpkeep = timeSatisfied && raffleOpen && hasPlayers && hasBalance;
+        return (doUpkeep, "");
+    }
+
     function fulfillRandomWords(
-        uint256,
+        uint256 /* requestId */,
         uint256[] memory randomWord
     ) internal override {
         uint256 winnerIndex = randomWord[0] % s_players.length;
@@ -119,14 +139,15 @@ contract Raffle is VRFConsumerBaseV2 {
         s_raffleState = RaffleState.OPEN;
         s_lastTimeStamp = block.timestamp;
         s_players = new address payable[](0);
+        emit PickedWinner(s_recentWinner);
+
         (bool success, ) = s_recentWinner.call{value: address(this).balance}("");
         if(!success) {
             revert Raffle__TranferFailed();
         }
-        emit PickedWinner(s_recentWinner);
     }
 
-    /** Getter Functions */
+    /** Getting Functions */
     function getEntranceFee() public view returns(uint256) {
         return i_entranceFee;
     }
