@@ -98,17 +98,25 @@ contract Raffle is VRFConsumerBaseV2 {
        if(!upkeepNeeded){
             revert Raffle__NotPerformUpkeep(address(this).balance, s_players.length, i_interval, uint256(s_raffleState));
        }
-        // 1. Request the RNG
+        // Request the RNG
         // https://docs.chain.link/vrf/v2/subscription/supported-networks
         s_raffleState = RaffleState.CALCULATING;
-        uint256 requestId = i_vrfCoordinator.requestRandomWords(
+
+        // uint256 requestId = i_vrfCoordinator.requestRandomWords(
+        //     i_gasLane, // gas lane
+        //     i_subscriptionId,
+        //     REQUEST_CONFIRMATIONS,
+        //     i_callbackGasLimit,
+        //     NUM_WORDS
+        // );
+
+        i_vrfCoordinator.requestRandomWords(
             i_gasLane, // gas lane
             i_subscriptionId,
             REQUEST_CONFIRMATIONS,
             i_callbackGasLimit,
             NUM_WORDS
         );
-        // 2. Get the random number
     }
 
     /**
