@@ -25,7 +25,6 @@ pragma solidity ^0.8.18;
 
 import {VRFCoordinatorV2Interface} from "@chainlink/contracts@0.8.0/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import {VRFConsumerBaseV2} from "@chainlink/contracts@0.8.0/src/v0.8/VRFConsumerBaseV2.sol";
-
 /**
  * @title A sample Raffle Contract
  * @author Yuk1
@@ -62,6 +61,7 @@ contract Raffle is VRFConsumerBaseV2 {
 
     event EnteredRaffle(address indexed player);
     event PickedWinner(address indexed winner);
+    event RequestedRaffleWinner(uint256 indexed requestId);
 
     constructor(
         uint256 entranceFee, 
@@ -110,13 +110,14 @@ contract Raffle is VRFConsumerBaseV2 {
         //     NUM_WORDS
         // );
 
-        i_vrfCoordinator.requestRandomWords(
+        uint256 requestId = i_vrfCoordinator.requestRandomWords(
             i_gasLane, // gas lane
             i_subscriptionId,
             REQUEST_CONFIRMATIONS,
             i_callbackGasLimit,
             NUM_WORDS
         );
+        emit RequestedRaffleWinner(requestId);
     }
 
     /**
