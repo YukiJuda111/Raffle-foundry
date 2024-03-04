@@ -103,14 +103,6 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatibleInterface {
         // https://docs.chain.link/vrf/v2/subscription/supported-networks
         s_raffleState = RaffleState.CALCULATING;
 
-        // uint256 requestId = i_vrfCoordinator.requestRandomWords(
-        //     i_gasLane, // gas lane
-        //     i_subscriptionId,
-        //     REQUEST_CONFIRMATIONS,
-        //     i_callbackGasLimit,
-        //     NUM_WORDS
-        // );
-
         uint256 requestId = i_vrfCoordinator.requestRandomWords(
             i_gasLane, // gas lane
             i_subscriptionId,

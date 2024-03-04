@@ -2,7 +2,9 @@
 
 ## Quick Start
 `make install` to install the dependencies
+
 `make build` to compile the contract
+
 `make  deploy` to deploy the contract on sopelia network using your own private key
 
 ## Usage of Raffle
