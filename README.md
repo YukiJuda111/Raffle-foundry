@@ -1,5 +1,7 @@
 # Proveably Random Raffle Contracts
 
+### My note about the project: [note](https://yukijuda111.github.io/note/blockchain/solidity/raffle/)
+
 ## Quick Start
 `make install` to install the dependencies
 

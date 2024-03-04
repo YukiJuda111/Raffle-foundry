@@ -26,6 +26,7 @@ pragma solidity ^0.8.18;
 import {VRFCoordinatorV2Interface} from "@chainlink/contracts@0.8.0/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import {VRFConsumerBaseV2} from "@chainlink/contracts@0.8.0/src/v0.8/VRFConsumerBaseV2.sol";
 import {AutomationCompatibleInterface} from "@chainlink/contracts@0.8.0/src/v0.8/interfaces/AutomationCompatibleInterface.sol";
+import {console} from "forge-std/console.sol";
 /**
  * @title A sample Raffle Contract
  * @author Yuk1
