@@ -1,6 +1,11 @@
 # Proveably Random Raffle Contracts
 
-## What we want it to do?
+## Quick Start
+`make install` to install the dependencies
+`make build` to compile the contract
+`make  deploy` to deploy the contract on sopelia network using your own private key
+
+## Usage of Raffle
 1. Users can enter by paying for a ticket
    1. The ticket fees are going to go to the winner during the draw
 2. After X period of time, the lottery will automatically draw a winner
