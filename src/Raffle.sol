@@ -25,17 +25,18 @@ pragma solidity ^0.8.18;
 
 import {VRFCoordinatorV2Interface} from "@chainlink/contracts@0.8.0/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import {VRFConsumerBaseV2} from "@chainlink/contracts@0.8.0/src/v0.8/VRFConsumerBaseV2.sol";
+import {AutomationCompatibleInterface} from "@chainlink/contracts@0.8.0/src/v0.8/interfaces/AutomationCompatibleInterface.sol";
 /**
  * @title A sample Raffle Contract
  * @author Yuk1
  * @notice 
  * @dev Implements Chainlink VRFv2
  */
-contract Raffle is VRFConsumerBaseV2 {
+contract Raffle is VRFConsumerBaseV2, AutomationCompatibleInterface {
     error Raffle__NotEnoughEthSent();
     error Raffle__TranferFailed();
     error Raffle__NotOpen();
-    error Raffle__NotPerformUpkeep(uint256 balance, uint256 playersNum, uint256 interval, uint256 state);
+    error Raffle__NotPerformUpkeep(uint256 balance, uint256 playersNum, uint256 state);
 
     enum RaffleState{
         OPEN,
@@ -93,10 +94,10 @@ contract Raffle is VRFConsumerBaseV2 {
         emit EnteredRaffle(msg.sender);
     }
 
-    function performUpkeep(bytes calldata /* performData */) external {
+    function performUpkeep(bytes calldata /* performData */) external override {
         (bool upkeepNeeded,) = checkUpkeep(bytes(""));
        if(!upkeepNeeded){
-            revert Raffle__NotPerformUpkeep(address(this).balance, s_players.length, i_interval, uint256(s_raffleState));
+            revert Raffle__NotPerformUpkeep(address(this).balance, s_players.length, uint256(s_raffleState));
        }
         // Request the RNG
         // https://docs.chain.link/vrf/v2/subscription/supported-networks
@@ -128,6 +129,7 @@ contract Raffle is VRFConsumerBaseV2 {
     )
         public
         view
+        override
         returns (bool upkeepNeeded, bytes memory /* performData */)
     {
         bool timeSatisfied = (block.timestamp - s_lastTimeStamp) > i_interval;
@@ -165,5 +167,17 @@ contract Raffle is VRFConsumerBaseV2 {
 
     function getPlayer(uint256 indexOfPlayer) external view returns(address) {
         return s_players[indexOfPlayer];
+    }
+
+    function getRecentWinner() external view returns(address) {
+        return s_recentWinner;
+    }
+
+    function getLengthOfPlayers() external view returns(uint256) {
+        return s_players.length;
+    }
+
+    function getLastTimeStamp() external view returns(uint256) {
+        return s_lastTimeStamp;
     }
 }
